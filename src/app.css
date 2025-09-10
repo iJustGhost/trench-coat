@@ -5,7 +5,7 @@ body {
 }
 
 input[type=text], input[type=password] {
-    @apply text-white border-2 border-green-700 text-2xl outline-0 p-2 my-2;
+    @apply text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1;
 }
 
 input[type=button] {

@@ -38,6 +38,6 @@
 		value="Create New Identity"
 		id="create-new"
 		class={createButtonView}
-		onclick={goto('/createidentity')}
+		onclick={() => goto('/createidentity')}
 	/>
 </div>
