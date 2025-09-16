@@ -1,23 +1,30 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { getIdentity, getPassword } from '$lib/openpgp';
+	import { getIdentity, verifyIdentity } from '$lib/openpgp';
 	import { onMount } from 'svelte';
 
 	var loginView = $state('hidden');
 	var createButtonView = $state('');
-    var password = $state('')
+	var password = $state('');
+	var passwordStatus = $state('text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1')
 
-    function login() {
-        if (getPassword() === password) {
-            goto('/contacts')
-        }
-    }
+	async function verify() {
+		if (!(await verifyIdentity(password))) {
+			passwordStatus = 'text-white border-2 border-red-700 text-2xl outline-0 p-2 my-1'
+			return
+		}
+		passwordStatus = 'text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1'
+		goto('/contacts')
+	}
 
-	onMount(() => {
-		if (getIdentity()) {
+	onMount(async () => {
+		if (await getIdentity()) {
 			loginView = 'flex';
 			createButtonView = 'hidden';
+			return;
 		}
+		loginView = 'hidden';
+		createButtonView = '';
 	});
 </script>
 
@@ -30,8 +37,8 @@
 
 <div class="absolute w-1/2 translate-1/2">
 	<div id="login" class="{loginView} flex-col">
-		<input type="password" name="password" placeholder="Password" bind:value={password} />
-		<input type="button" value="Enter" onclick={login()} />
+		<input type="password" name="password" placeholder="Password" bind:value={password} class={passwordStatus} />
+		<input type="button" value="Enter" onclick={verify} />
 	</div>
 	<input
 		type="button"
