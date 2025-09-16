@@ -10,8 +10,8 @@
 	var email = $state('');
 	var comment = $state('');
 
-	function setIdentity() {
-		createIdentity(username, password, email, comment);
+	async function create() {
+		await createIdentity(username, password, email, comment);
 		goto('/');
 	}
 </script>
@@ -22,10 +22,10 @@
 
 <div class="mx-4 flex flex-col">
 	<input type="text" placeholder="Username" bind:value={username} />
-	<input type="password" placeholder="Password" bind:value={password} />
+	<input class="text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1" type="password" placeholder="Password" bind:value={password} />
 	<p class="text-sm text-gray-500">* Will be seen in others contacts list</p>
 	<input type="text" placeholder="Comment" bind:value={comment} />
 	<p class="text-sm text-gray-500">* Just for identification</p>
-	<input type="text" placeholder="Email" />
-	<input type="button" value="Create" onclick={setIdentity} />
+	<input type="text" placeholder="Email" bind:value={email}/>
+	<input type="button" value="Create" onclick={create} />
 </div>
