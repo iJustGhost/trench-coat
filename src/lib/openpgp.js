@@ -58,7 +58,7 @@ export async function verifyIdentity(passphrase) {
 		username = await armoredPrivateKey.users[0].userID.name;
 		email = await armoredPrivateKey.users[0].userID.email;
 		comment = await armoredPrivateKey.users[0].userID.comment;
-		armoredPublicKey = await readTextFile((await appConfigDir()) + '/identity/privateKey.txt')
+		armoredPublicKey = await readTextFile((await appConfigDir()) + '/identity/publicKey.txt')
 
 		return true;
 	} catch {
