@@ -6,14 +6,14 @@
 	var loginView = $state('hidden');
 	var createButtonView = $state('');
 	var password = $state('');
-	var passwordStatus = $state('text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1')
+	var passwordStatus = $state('')
 
 	async function verify() {
 		if (!(await verifyIdentity(password))) {
-			passwordStatus = 'text-white border-2 border-red-700 text-2xl outline-0 p-2 my-1'
+			passwordStatus = 'invalid'
 			return
 		}
-		passwordStatus = 'text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1'
+		passwordStatus = ''
 		goto('/contacts')
 	}
 
