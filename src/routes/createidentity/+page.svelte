@@ -5,13 +5,53 @@
 
 	import { createIdentity } from '$lib/openpgp';
 
+	var usernameStatus = $state('');
 	var username = $state('');
+
+	var passwordStatus = $state('');
 	var password = $state('');
-	var email = $state('');
+
+	var commentStatus = $state('');
 	var comment = $state('');
 
+	var emailStatus = $state('')
+	var email = $state('');
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 	async function create() {
+		var isInvalid = false;
+		usernameStatus = ''
+		passwordStatus = ''
+		commentStatus = ''
+		emailStatus = ''
+		
+		if (username === '') {
+			usernameStatus = 'invalid'
+			isInvalid = true;
+		}
+		if (password === '') {
+			passwordStatus = 'invalid'
+			isInvalid = true;
+		}
+		if (comment === '') {
+			commentStatus = 'invalid'
+			isInvalid = true;
+		}
+		if (!emailRegex.test(email)) {
+			emailStatus = 'invalid'
+			isInvalid = true;
+		}
+		if (isInvalid) {
+			return;
+		}
+		
 		await createIdentity(username, password, email, comment);
+
+		username = ''
+		password = ''
+		email = ''
+		comment = ''
+
 		goto('/');
 	}
 </script>
@@ -21,11 +61,11 @@
 </p>
 
 <div class="mx-4 flex flex-col">
-	<input type="text" placeholder="Username" bind:value={username} />
-	<input class="text-white border-2 border-green-700 text-2xl outline-0 p-2 my-1" type="password" placeholder="Password" bind:value={password} />
+	<input class={usernameStatus} type="text" placeholder="Username" bind:value={username} />
+	<input class={passwordStatus} type="password" placeholder="Password" bind:value={password} />
 	<p class="text-sm text-gray-500">* Will be seen in others contacts list</p>
-	<input type="text" placeholder="Comment" bind:value={comment} />
+	<input class={commentStatus} type="text" placeholder="Comment" bind:value={comment} />
 	<p class="text-sm text-gray-500">* Just for identification</p>
-	<input type="text" placeholder="Email" bind:value={email}/>
+	<input class={emailStatus} type="email" placeholder="Email" bind:value={email}/>
 	<input type="button" value="Create" onclick={create} />
 </div>
