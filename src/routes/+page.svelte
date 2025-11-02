@@ -3,28 +3,28 @@
 	import { getIdentity, verifyIdentity } from '$lib/openpgp';
 	import { onMount } from 'svelte';
 
-	var loginView = $state('hidden');
-	var createButtonView = $state('');
+	var loginView = $state('mt-8 hidden');
+	var createButtonView = $state('text-2xl mt-8');
 	var password = $state('');
-	var passwordStatus = $state('')
+	var passwordStatus = $state('text-2xl')
 
 	async function verify() {
 		if (!(await verifyIdentity(password))) {
-			passwordStatus = 'invalid'
+			passwordStatus = 'text-2xl invalid'
 			return
 		}
-		passwordStatus = ''
+		passwordStatus = 'text-2xl'
 		goto('/contacts')
 	}
 
 	onMount(async () => {
 		if (await getIdentity()) {
 			loginView = 'flex';
-			createButtonView = 'hidden';
+			createButtonView = 'text-2xl mt-8 hidden';
 			return;
 		}
-		loginView = 'hidden';
-		createButtonView = '';
+		loginView = 'mt-8 hidden';
+		createButtonView = 'text-2xl mt-8';
 	});
 </script>
 
@@ -38,7 +38,7 @@
 <div class="absolute w-1/2 translate-1/2">
 	<div id="login" class="{loginView} flex-col">
 		<input type="password" name="password" placeholder="Password" bind:value={password} class={passwordStatus} />
-		<input type="button" value="Enter" onclick={verify} />
+		<input class="mt-8" type="button" value="Enter" onclick={verify} />
 	</div>
 	<input
 		type="button"

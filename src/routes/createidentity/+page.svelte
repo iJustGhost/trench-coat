@@ -6,40 +6,40 @@
 	import { createIdentity, isIdentityExists } from '$lib/openpgp';
 	import { onMount } from 'svelte';
 
-	var usernameStatus = $state('');
+	var usernameStatus = $state('text-2xl');
 	var username = $state('');
 
-	var passwordStatus = $state('');
+	var passwordStatus = $state('text-2xl');
 	var password = $state('');
 
-	var commentStatus = $state('');
+	var commentStatus = $state('text-2xl');
 	var comment = $state('');
 
-	var emailStatus = $state('');
+	var emailStatus = $state('text-2xl');
 	var email = $state('');
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	async function create() {
 		var isInvalid = false;
-		usernameStatus = '';
-		passwordStatus = '';
-		commentStatus = '';
-		emailStatus = '';
+		usernameStatus = 'text-2xl';
+		passwordStatus = 'text-2xl';
+		commentStatus = 'text-2xl';
+		emailStatus = 'text-2xl';
 
 		if (username === '') {
-			usernameStatus = 'invalid';
+			usernameStatus = 'text-2xl invalid';
 			isInvalid = true;
 		}
 		if (password === '') {
-			passwordStatus = 'invalid';
+			passwordStatus = 'text-2xl invalid';
 			isInvalid = true;
 		}
 		if (comment === '') {
-			commentStatus = 'invalid';
+			commentStatus = 'text-2xl invalid';
 			isInvalid = true;
 		}
 		if (!emailRegex.test(email)) {
-			emailStatus = 'invalid';
+			emailStatus = 'text-2xl invalid';
 			isInvalid = true;
 		}
 		if (isInvalid) {
@@ -74,5 +74,5 @@
 	<input class={commentStatus} type="text" placeholder="Comment" bind:value={comment} />
 	<p class="text-sm text-gray-500">* Just for identification</p>
 	<input class={emailStatus} type="email" placeholder="Email" bind:value={email} />
-	<input type="button" value="Create" onclick={create} />
+	<input class="text-2xl mt-8" type="button" value="Create" onclick={create} />
 </div>
