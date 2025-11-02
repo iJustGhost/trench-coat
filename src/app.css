@@ -7,11 +7,13 @@ body {
 input[type='text'],
 input[type='email'],
 input[type='password'] {
-	@apply my-1 border-2 border-green-700 p-2 text-2xl text-white outline-0 duration-200 focus:border-green-500;
+	@apply my-1 border-2 border-green-700 p-2 text-white outline-0 duration-200 focus:border-green-500;
 }
 
-input[type='button'] {
-	@apply mt-8 cursor-pointer bg-green-700 p-2 text-2xl duration-200 hover:bg-green-500;
+input[type='button'],
+button,
+.button {
+	@apply cursor-pointer bg-green-700 p-2 duration-200 hover:bg-green-500;
 }
 
 .invalid {
