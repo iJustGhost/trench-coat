@@ -17,7 +17,8 @@
         "height": 480,
         "resizable": false,
         "fullscreen": false,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "maximizable": false
       }
     ],
     "security": {
