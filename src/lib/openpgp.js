@@ -7,6 +7,20 @@ var armoredPrivateKey = '';
 export var username = '';
 export var email = '';
 export var comment = '';
+var password = '';
+
+export async function verifyContactKey(key) {
+	try {
+		var contact = await openpgp.readKey({
+			armoredKey: atob(key)
+		});
+		var filename = await contact.users[0].userID.name + '(' + await contact.users[0].userID.email + ')';
+		await writeTextFile('contacts/' + filename, atob(key), { baseDir: BaseDirectory.AppConfig });
+		return filename;
+	} catch {
+		return invalid;
+	}
+}
 
 export async function createIdentity(textUsername, textPassword, textEmail, textComment) {
 	var { privateKey, publicKey } = await openpgp.generateKey({
@@ -22,12 +36,12 @@ export async function createIdentity(textUsername, textPassword, textEmail, text
 		passphrase: textPassword
 	});
 
-	await writeTextFile('identity/publicKey.txt', publicKey, { baseDir: BaseDirectory.AppConfig });
-	await writeTextFile('identity/privateKey.txt', privateKey, { baseDir: BaseDirectory.AppConfig });
+	await writeTextFile('publicKey', publicKey, { baseDir: BaseDirectory.AppConfig });
+	await writeTextFile('privateKey', privateKey, { baseDir: BaseDirectory.AppConfig });
 }
 
 export async function isIdentityExists() {
-	const folderExists = await exists('identity/privateKey.txt', {
+	const folderExists = await exists('privateKey', {
 		baseDir: BaseDirectory.AppConfig
 	});
 	return folderExists;
@@ -36,18 +50,17 @@ export async function isIdentityExists() {
 export async function getIdentity() {
 	try {
 		await mkdir(await appConfigDir());
-		await mkdir('identity', { baseDir: BaseDirectory.AppConfig });
 		await mkdir('contacts', { baseDir: BaseDirectory.AppConfig });
 		await mkdir('messages', { baseDir: BaseDirectory.AppConfig });
 		return false;
 	} catch {
-		if (!(await exists('identity/privateKey.txt', { baseDir: BaseDirectory.AppConfig }))) {
+		if (!(await exists('privateKey', { baseDir: BaseDirectory.AppConfig }))) {
 			return false;
 		}
 	}
 
 	armoredPublicKey = await openpgp.readKey({
-		armoredKey: await readTextFile('identity/publicKey.txt', { baseDir: BaseDirectory.AppConfig})
+		armoredKey: await readTextFile('publicKey', { baseDir: BaseDirectory.AppConfig })
 	});
 
 	return true;
@@ -57,7 +70,7 @@ export async function verifyIdentity(passphrase) {
 	try {
 		armoredPrivateKey = await openpgp.decryptKey({
 			privateKey: await openpgp.readPrivateKey({
-				armoredKey: await readTextFile('identity/privateKey.txt', {
+				armoredKey: await readTextFile('privateKey', {
 					baseDir: BaseDirectory.AppConfig
 				})
 			}),
@@ -67,10 +80,11 @@ export async function verifyIdentity(passphrase) {
 		username = await armoredPrivateKey.users[0].userID.name;
 		email = await armoredPrivateKey.users[0].userID.email;
 		comment = await armoredPrivateKey.users[0].userID.comment;
-		armoredPublicKey = await readTextFile('identity/publicKey.txt', {
+		armoredPublicKey = await readTextFile('publicKey', {
 			baseDir: BaseDirectory.AppConfig
 		});
 
+		password = passphrase;
 		return true;
 	} catch {
 		return false;
