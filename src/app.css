@@ -21,11 +21,11 @@ button,
 }
 
 .contact {
-	@apply mb-2 cursor-pointer bg-gray-900 p-2;
+	@apply mb-2 cursor-pointer bg-green-950 p-2;
 }
 
 .contact:hover {
-	@apply bg-gray-700;
+	@apply bg-green-900;
 }
 
 .username {

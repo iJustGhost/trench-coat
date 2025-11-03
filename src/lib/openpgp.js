@@ -1,5 +1,12 @@
 import { appConfigDir, BaseDirectory } from '@tauri-apps/api/path';
-import { exists, mkdir, readFile, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
+import {
+	exists,
+	mkdir,
+	readDir,
+	readFile,
+	readTextFile,
+	writeTextFile
+} from '@tauri-apps/plugin-fs';
 import * as openpgp from 'openpgp';
 
 export var armoredPublicKey = '';
@@ -9,16 +16,41 @@ export var email = '';
 export var comment = '';
 var password = '';
 
+export async function getContactsList() {
+	var contacts = await readDir('contacts', { baseDir: BaseDirectory.AppConfig });
+	var list = [];
+	for (var i = 0; i < contacts.length; i++) {
+		try {
+			var key = await openpgp.readKey({
+				armoredKey: await readTextFile('contacts/' + contacts[i].name, {
+					baseDir: BaseDirectory.AppConfig
+				})
+			});
+
+			list.push({
+				name: key.users[0].userID.name,
+				email: key.users[0].userID.email,
+				comment: key.users[0].userID.comment,
+				key: key
+			});
+		} catch {
+			//do nothing
+		}
+	}
+	return list;
+}
+
 export async function verifyContactKey(key) {
 	try {
 		var contact = await openpgp.readKey({
 			armoredKey: atob(key)
 		});
-		var filename = await contact.users[0].userID.name + '(' + await contact.users[0].userID.email + ')';
-		await writeTextFile('contacts/' + filename, atob(key), { baseDir: BaseDirectory.AppConfig });
-		return filename;
+		await writeTextFile('contacts/' + crypto.randomUUID(), atob(key), {
+			baseDir: BaseDirectory.AppConfig
+		});
+		return (contact.users[0].userID.name) + '(' + (contact.users[0].userID.email) + ')';
 	} catch {
-		return invalid;
+		return 'invalid';
 	}
 }
 
@@ -77,9 +109,9 @@ export async function verifyIdentity(passphrase) {
 			passphrase
 		});
 
-		username = await armoredPrivateKey.users[0].userID.name;
-		email = await armoredPrivateKey.users[0].userID.email;
-		comment = await armoredPrivateKey.users[0].userID.comment;
+		username = armoredPrivateKey.users[0].userID.name;
+		email = armoredPrivateKey.users[0].userID.email;
+		comment = armoredPrivateKey.users[0].userID.comment;
 		armoredPublicKey = await readTextFile('publicKey', {
 			baseDir: BaseDirectory.AppConfig
 		});

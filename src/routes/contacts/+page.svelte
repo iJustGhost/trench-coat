@@ -1,76 +1,76 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { armoredPublicKey, comment, email, username } from '$lib/openpgp';
+	import { armoredPublicKey, comment, email, getContactsList, username } from '$lib/openpgp';
+	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {import('./$types').PageProps} */
 	let { data } = $props();
 
 	var searchString = $state('');
+	var contacts = [];
+	var results = $state('');
 
-	function copyPublicKey() {
-		navigator.clipboard.writeText(armoredPublicKey);
-	}
-
-	onMount(() => {
+	onMount(async () => {
 		if (!armoredPublicKey) {
 			goto('/');
+			return;
 		}
+		contacts = await getContactsList();
+		results = contacts;
 	});
+
+	function searchContacts() {
+		results = [];
+
+		contacts.forEach((contact) => {
+			if (
+				contact.name.toLowerCase().includes(searchString.toLowerCase()) ||
+				contact.email.toLowerCase().includes(searchString.toLowerCase())
+			) {
+				results.push(contact); // append to results if match found
+			}
+		});
+	}
+
+	function addNewContact() {
+		goto('/contacts/add');
+	}
 </script>
 
-<div class="mx-4 my-4">
-	<p class="mb-2 flex text-5xl">{username}</p>
-	<div class="flex items-center justify-between">
+<div class="mx-4 my-4 flex items-center justify-between">
+	<div>
+		<p class="mb-2 flex text-4xl">{username.slice(0, 10)}</p>
 		<div class="flex">
-			<p>{email}</p>
-			<p class="ml-2">({comment})</p>
+			<p>{email.slice(0, 10)}</p>
+			<p class="ml-2">({comment.slice(0, 10)})</p>
 		</div>
-		<button class="ml-2 cursor-pointer bg-green-700 p-1 text-sm" onclick={copyPublicKey}
-			>Copy Public Key</button
-		>
 	</div>
+	<p class="text-3xl">
+		<span class="text-green-700">Contacts</span> List
+	</p>
 </div>
 
-<div class="mx-4 flex items-center justify-around w-full">
-	<p class="text-2xl">Contacts</p>
-	<div class="flex items-center">
-		<input class="text-sm w-2/3" type="text" name="search" placeholder="Search" />
-		<p>Search</p>
-	</div>
+<div class="flex w-full items-center justify-evenly">
+	<button class="button" onclick={addNewContact}>
+		<Icon icon="material-symbols:add" class="h-full w-full" />
+	</button>
+
+	<input
+		class="text-2xl"
+		type="text"
+		name="search"
+		placeholder="Search"
+		bind:value={searchString}
+		oninput={searchContacts}
+	/>
 </div>
 
 <div class="mx-8 my-2 h-72 overflow-auto">
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
-	<div class="contact">
-		<p class="username">Lorem ipsum</p>
-		<p class="email">Lorem ipsum@mail.com</p>
-	</div>
+	{#each results as result}
+		<div class="contact">
+			<p>{result.name} ({result.email})</p>
+			<p>{result.comment}</p>
+		</div>
+	{/each}
 </div>
