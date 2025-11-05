@@ -31,7 +31,7 @@ export async function getContactsList() {
 				name: key.users[0].userID.name,
 				email: key.users[0].userID.email,
 				comment: key.users[0].userID.comment,
-				key: key
+				filename: contacts[i].name
 			});
 		} catch {
 			//do nothing

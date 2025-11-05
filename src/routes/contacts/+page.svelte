@@ -2,7 +2,9 @@
 	import { goto } from '$app/navigation';
 	import { armoredPublicKey, comment, email, getContactsList, username } from '$lib/openpgp';
 	import Icon from '@iconify/svelte';
+	import { BaseDirectory, remove } from '@tauri-apps/plugin-fs';
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
 	/** @type {import('./$types').PageProps} */
 	let { data } = $props();
@@ -40,10 +42,10 @@
 
 <div class="mx-4 my-4 flex items-center justify-between">
 	<div>
-		<p class="mb-2 flex text-4xl">{username.slice(0, 10)}</p>
+		<p class="mb-2 flex text-4xl">{username}</p>
 		<div class="flex">
-			<p>{email.slice(0, 10)}</p>
-			<p class="ml-2">({comment.slice(0, 10)})</p>
+			<p>{email}</p>
+			<p class="ml-2">({comment})</p>
 		</div>
 	</div>
 	<p class="text-3xl">
@@ -68,9 +70,25 @@
 
 <div class="mx-8 my-2 h-72 overflow-auto">
 	{#each results as result}
-		<div class="contact">
-			<p>{result.name} ({result.email})</p>
-			<p>{result.comment}</p>
+		<div class="contact flex w-full items-center justify-between">
+			<a
+				href="#none"
+				onclick={() => {
+					goto(`/contacts/message?name=${result.name}&email=${result.email}&filename=${result.filename}`)
+				}}
+			>
+				<p>{result.name} ({result.email})</p>
+				<p>{result.comment}</p>
+			</a>
+			<Icon
+				icon="material-symbols:restore-from-trash-outline"
+				class="text-4xl text-red-800 hover:text-red-400"
+				onclick={async () => {
+					await remove('contacts/' + result.filename, { baseDir: BaseDirectory.AppConfig });
+					contacts = await getContactsList();
+					results = contacts;
+				}}
+			/>
 		</div>
 	{/each}
 </div>
