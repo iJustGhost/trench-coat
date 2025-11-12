@@ -1,12 +1,5 @@
 import { appConfigDir, BaseDirectory } from '@tauri-apps/api/path';
-import {
-	exists,
-	mkdir,
-	readDir,
-	readFile,
-	readTextFile,
-	writeTextFile
-} from '@tauri-apps/plugin-fs';
+import { exists, mkdir, readDir, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import * as openpgp from 'openpgp';
 
 export var armoredPublicKey = '';
@@ -14,7 +7,6 @@ var armoredPrivateKey = '';
 export var username = '';
 export var email = '';
 export var comment = '';
-var password = '';
 
 export async function getContactsList() {
 	var contacts = await readDir('contacts', { baseDir: BaseDirectory.AppConfig });
@@ -48,7 +40,7 @@ export async function verifyContactKey(key) {
 		await writeTextFile('contacts/' + crypto.randomUUID(), atob(key), {
 			baseDir: BaseDirectory.AppConfig
 		});
-		return (contact.users[0].userID.name) + '(' + (contact.users[0].userID.email) + ')';
+		return contact.users[0].userID.name + '(' + contact.users[0].userID.email + ')';
 	} catch {
 		return 'invalid';
 	}
@@ -116,9 +108,25 @@ export async function verifyIdentity(passphrase) {
 			baseDir: BaseDirectory.AppConfig
 		});
 
-		password = passphrase;
 		return true;
 	} catch {
 		return false;
 	}
+}
+
+export async function decryptMessage(message) {
+	return await openpgp.decrypt({
+		message: await openpgp.readMessage({ armoredMessage: message }),
+		decryptionKeys: armoredPrivateKey
+	});
+}
+
+export async function encryptMessage(message, key) {
+	var contactKey = await readTextFile('contacts/' + key, {
+		baseDir: BaseDirectory.AppConfig
+	});
+	return await openpgp.encrypt({
+		message: await openpgp.createMessage({ text: message }),
+		encryptionKeys: await openpgp.readKey({ armoredKey: contactKey })
+	});
 }
