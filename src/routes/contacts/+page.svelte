@@ -43,10 +43,8 @@
 <div class="mx-4 my-4 flex items-center justify-between">
 	<div>
 		<p class="mb-2 flex text-4xl">{username}</p>
-		<div class="flex">
-			<p>{email}</p>
-			<p class="ml-2">({comment})</p>
-		</div>
+		<p>{email}</p>
+		<p>({comment.length > 25 ? comment.slice(0, 25) + '...' : comment})</p>
 	</div>
 	<p class="text-3xl">
 		<span class="text-green-700">Contacts</span> List
@@ -70,19 +68,24 @@
 
 <div class="mx-8 my-2 h-72 overflow-auto">
 	{#each results as result}
-		<div class="contact flex w-full items-center justify-between">
+		<div class="flex w-full items-center justify-between">
 			<a
 				href="#none"
+				class="contact flex w-full items-center justify-between"
 				onclick={() => {
-					goto(`/contacts/message?name=${result.name}&email=${result.email}&filename=${result.filename}`)
+					goto(
+						`/contacts/message?name=${result.name}&email=${result.email}&comment=${result.comment}&filename=${result.filename}`
+					);
 				}}
 			>
-				<p>{result.name} ({result.email})</p>
-				<p>{result.comment}</p>
+				<div>
+					<p>{result.name} ({result.email})</p>
+					<p>{result.comment}</p>
+				</div>
 			</a>
 			<Icon
-				icon="material-symbols:restore-from-trash-outline"
-				class="text-4xl text-red-800 hover:text-red-400"
+				icon="material-symbols:delete-outline"
+				class="cursor-pointer text-5xl text-red-800 hover:text-red-400"
 				onclick={async () => {
 					await remove('contacts/' + result.filename, { baseDir: BaseDirectory.AppConfig });
 					contacts = await getContactsList();
