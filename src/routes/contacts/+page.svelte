@@ -43,8 +43,8 @@
 <div class="mx-4 my-4 flex items-center justify-between">
 	<div>
 		<p class="mb-2 flex text-4xl">{username}</p>
-		<p>{email}</p>
-		<p>({comment.length > 25 ? comment.slice(0, 25) + '...' : comment})</p>
+		<p>{email.length > 28 ? email.slice(0, 28) + '...' : email}</p>
+		<p>({comment.length > 28 ? comment.slice(0, 28) + '...' : comment})</p>
 	</div>
 	<p class="text-3xl">
 		<span class="text-green-700">Contacts</span> List

@@ -6,7 +6,8 @@ body {
 
 input[type='text'],
 input[type='email'],
-input[type='password'] {
+input[type='password'],
+textarea {
 	@apply my-1 border-2 border-green-700 p-2 text-white outline-0 duration-200 focus:border-green-500;
 }
 
